@@ -20,8 +20,7 @@ btn.imageView.setVisibility(View.VISIBLE);√
 在android虚拟机运行时，当界面大小发生变化时，系统会重新测量组件布局，需要重新绘制，会消耗一定的内存,所以不推荐使用
 * 5当使用fragment时 使用系统自带的fragment而不要使用v4包里的,v4包里的fragment使用时会多一些层级，而且没啥用
 
-###字符串优化
- 尽量用StringBuilder代替Stirng<br>  
+### 字符串优化:尽量用StringBuilder代替Stirng<br>  
  速度快慢为：StringBuilder > StringBuffer > String
  上代码:
  ```
@@ -96,6 +95,12 @@ btn.imageView.setVisibility(View.VISIBLE);√
  ```
  让我们看看效果
 ## String
+![图3](https://github.com/forevermistery/UI-Optimization/blob/master/screen_shoot/fun_string.png)<br>
+从上图我们可以看出，开始时间为`14:16:23.537` 结束时间为`14:16:28.153`花了5秒多
+## StringBuilder
+![图4](https://github.com/forevermistery/UI-Optimization/blob/master/screen_shoot/fun_stringBuilder.png)<br>
+开始时间为`14:16:38.736` 结束时间为`14:16:38.743`飞快的结束任务
+#### 由此验证StringBuilder确实效率比string高，性能快
 
  
 
