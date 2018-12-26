@@ -22,6 +22,9 @@ btn.imageView.setVisibility(View.VISIBLE);√
 
 ### 字符串优化:尽量用StringBuilder代替Stirng<br>  
  速度快慢为：StringBuilder > StringBuffer > String<br>
+ 更具体可以看[博客园：酥风](http://www.cnblogs.com/su-feng/p/6659064.html)<br>
+ 
+[baidu]:http://www.baidu.com/img/bdlogo.gif "百度Logo" 
  #### String最慢的原因：<br>
 　　String为字符串常量，而StringBuilder和StringBuffer均为字符串变量，即String对象一旦创建之后该对象是不可更改的，但后两者的对象是变量，是可以更改的。<br>
  上代码:
