@@ -21,7 +21,9 @@ btn.imageView.setVisibility(View.VISIBLE);√
 * 5当使用fragment时 使用系统自带的fragment而不要使用v4包里的,v4包里的fragment使用时会多一些层级，而且没啥用
 
 ### 字符串优化:尽量用StringBuilder代替Stirng<br>  
- 速度快慢为：StringBuilder > StringBuffer > String
+ 速度快慢为：StringBuilder > StringBuffer > String<br>
+ #### String最慢的原因：<br>
+　　String为字符串常量，而StringBuilder和StringBuffer均为字符串变量，即String对象一旦创建之后该对象是不可更改的，但后两者的对象是变量，是可以更改的。<br>
  上代码:
  ```
  public class MainActivity extends AppCompatActivity implements View.OnClickListener {
