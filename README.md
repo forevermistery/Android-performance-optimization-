@@ -112,7 +112,7 @@ btn.imageView.setVisibility(View.VISIBLE);√
  
 ## Bitmap 图片优化
 #### 主要有三种方法
-* 通过缩放图片 ``
+* 通过缩放图片 
 * 通过设置格式 `Bitmap.Config`
 * 加载大图时 `bitmapRegionDecoder.decodeRegion`
 ```public class MainActivity extends AppCompatActivity {
