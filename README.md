@@ -1,6 +1,6 @@
 # Android performance optimization 性能优化
 
-### UI优化
+## UI优化
 
 总而言之，就是布局结构越复杂，系统需要分配CPU/GPU渲染的内存越多,UI界面体验越不良好，因此UI优化就是尽可能的减少布局层次
 * 1 编写布局时尽量用RelativeLayout 在复杂布局时候有可能减少嵌套层数
@@ -20,7 +20,7 @@ btn.imageView.setVisibility(View.VISIBLE);√
 在android虚拟机运行时，当界面大小发生变化时，系统会重新测量组件布局，需要重新绘制，会消耗一定的内存,所以不推荐使用
 * 5当使用fragment时 使用系统自带的fragment而不要使用v4包里的,v4包里的fragment使用时会多一些层级，而且没啥用
 
-### 字符串优化:尽量用StringBuilder代替Stirng<br>  
+## 字符串优化:尽量用StringBuilder代替Stirng<br>  
  速度快慢为：StringBuilder > StringBuffer > String<br>
  更具体可以看[博客园：酥风](http://www.cnblogs.com/su-feng/p/6659064.html)<br>
  
@@ -107,6 +107,109 @@ btn.imageView.setVisibility(View.VISIBLE);√
 开始时间为`14:16:38.736` 结束时间为`14:16:38.743`飞快的结束任务
 #### 由此验证StringBuilder确实效率比string高，性能快
 
+
+
  
+## Bitmap 图片优化
+#### 主要有三种方法
+* 通过缩放图片 ``
+* 通过设置格式 `Bitmap.Config`
+* 加载大图时 `bitmapRegionDecoder.decodeRegion`
+```public class MainActivity extends AppCompatActivity {
+
+    private int height;
+    private int width;
+    private ImageView img_splah;
+    private String url="/mnt/shared/Image/icon.jpg";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        WindowManager wm= (WindowManager) getSystemService(WINDOW_SERVICE);
+         width = wm.getDefaultDisplay().getWidth();
+         height = wm.getDefaultDisplay().getHeight();
+         img_splah=findViewById(R.id.img_splash);
+
+//         img_splah.setLayerType(View.LAYER_TYPE_SOFTWARE, null);//使用后加载大图的黑屏变白屏
+
+        ChangeRGB();
+        //load_Part_img();
+
+
+
+    }
+    //
+    private void load_Part_img() {
+        File file=new File("/mnt/shared/Image/icon.jpg");
+        try {
+            FileInputStream inputStream=new FileInputStream(file);
+            BitmapRegionDecoder bitmapRegionDecoder=BitmapRegionDecoder.newInstance(inputStream,false);
+            //获取图片的宽高
+            BitmapFactory.Options tmpOptions=new BitmapFactory.Options();
+
+            int width=tmpOptions.outWidth;
+            int height=tmpOptions.outHeight;
+            //设置显示图片的中心区域
+            BitmapFactory.Options options=new BitmapFactory.Options();
+            options.inPreferredConfig=Bitmap.Config.ARGB_4444;
+            Bitmap bitmap=bitmapRegionDecoder.decodeRegion(
+                    new Rect(width/4-200,height/4-200,width/4+200,height/4+200),options);
+            System.out.println("bitmap的大小:"+bitmap.getByteCount());
+            img_splah.setImageBitmap(bitmap);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    //通过设置解码格式
+    private void ChangeRGB() {
+        /** A->透明度 R->红  G->绿   B->蓝
+         * Bitmap.Config.RGB_565      16位=2个字节   没有A通道，每个像素占用2个字节，图片失真小，但是没有透明度；
+         * Bitmap.Config.ARGB_4444    16位=2个字节   四个通道都是4位，每个像素占用2个字节，图片的失真比较严重；
+         * Bitmap.Config.ARGB_8888   32位=4个字节    四个通道都是8位，每个像素占用4个字节，图片质量是最高的，但是占用的内存也是最大的；
+         * Bitmap.Config.ALPHA_8    8位 =1个字节     只有A通道，每个像素占用1个字节大大小，只有透明度，没有颜色值。
+         */
+        //[2]图片大小  图片的宽*高*字节数
+        BitmapFactory.Options options=new BitmapFactory.Options();
+        options.inJustDecodeBounds=true;//不去真真解析位图，但是还能够获取到图片的宽高
+        options.inPreferredConfig=Bitmap.Config.ARGB_4444;
+        BitmapFactory.decodeFile(url,options);
+//        System.out.println("~~~~~~~~~~"+options);
+        //[3]获取图片宽 和高
+        int imgWidth=options.outWidth;
+        int imgHeight=options.outHeight;
+        System.out.println("图片的分辨率为"+imgWidth+"*"+imgHeight+"~~~系统的宽高为"+width+"*"+height);
+
+        //[4]计算缩放比 按照大的去缩放
+        int scale=1;//定义一个变量 缩放比
+        int scaleX=imgWidth/width; //有点怪的是这用int去相除，一般也不会是整数，导致scale初始值(不变)
+        int scaleY=imgHeight/height;//
+        if (scaleX>=scaleY && scaleY>scale){
+                    scale=scaleX;
+
+        }
+        if (scaleY>scaleX && scaleY>scale){
+            scale=scaleY;
+
+        }
+        System.out.println("~~~~~~~~缩放比为:"+scale);
+        //[5]按照我们计算出来的缩放比例进行显示图片
+        options.inSampleSize=scale;
+
+        //[6]开始真正洗的解析位图
+        options.inJustDecodeBounds=false;//去真正解析位图，但是还能获取到图片宽和高
+        Bitmap bitmap=BitmapFactory.decodeFile(url,options);
+        System.out.println("ARGB处理后```图片大小为"+bitmap.getByteCount());
+        img_splah.setImageBitmap(bitmap);//最后一步，把bitmap显示到ImageView上
+
+    }
+
+
+}
+```
 
     
